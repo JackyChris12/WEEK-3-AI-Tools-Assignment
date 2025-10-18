@@ -2,8 +2,10 @@ import spacy
 import bz2
 import re
 
-# Load the English NER model
-nlp = spacy.load("en_core_web_sm")
+def get_nlp_model():
+    """Loads and returns the spaCy model."""
+    # This function can be cached by the caller (e.g., Streamlit)
+    return spacy.load("en_core_web_sm")
 
 def extract_review_text(line):
     """Extract the review text from the FastText format"""
@@ -42,6 +44,7 @@ def process_reviews(file_path, num_reviews=10):
     print(f"Processing reviews from: {file_path}\n")
     print("=" * 80)
     
+    nlp = get_nlp_model() # Load model for standalone script execution
     with bz2.open(file_path, 'rt', encoding='utf-8') as file:
         for i, line in enumerate(file):
             if i >= num_reviews:

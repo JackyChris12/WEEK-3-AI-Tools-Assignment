@@ -1,6 +1,7 @@
 import spacy
 import bz2
 import re
+import argparse
 
 def get_nlp_model():
     """Loads and returns the spaCy model."""
@@ -84,15 +85,20 @@ def process_reviews(file_path, num_reviews=10):
 
 def main():
     """Main function to run the NLP analysis"""
+    parser = argparse.ArgumentParser(description="Analyze Amazon reviews from a compressed text file.")
+    parser.add_argument("file_path", help="Path to the .bz2 compressed review file (e.g., train.ft.txt.bz2)")
+    parser.add_argument("--num_reviews", type=int, default=10, help="Number of reviews to process")
+    args = parser.parse_args()
+
     print("\n" + "=" * 80)
     print("NLP ANALYSIS WITH spaCy - Amazon Product Reviews")
     print("=" * 80 + "\n")
     
-    # Process training data
-    train_file = "archive (1)/train.ft.txt.bz2"
-    
-    print("Analyzing sample reviews...\n")
-    process_reviews(train_file, num_reviews=10)
+    try:
+        print(f"Analyzing {args.num_reviews} sample reviews from {args.file_path}...\n")
+        process_reviews(args.file_path, num_reviews=args.num_reviews)
+    except FileNotFoundError:
+        print(f"Error: The file was not found at '{args.file_path}'")
     
     print("\n" + "=" * 80)
     print("ANALYSIS COMPLETE")

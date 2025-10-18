@@ -13,26 +13,25 @@ st.markdown(
 
 
 @st.cache_resource
-def load_modules():
-    # Import lazily so Streamlit starts even if heavy modules take time
-    # Use cache_resource because we return a module (not pickle-serializable)
-    import nlp_analysis as nlp_mod
-
-    return nlp_mod
+def load_nlp_model():
+    """Load the spaCy model and cache it."""
+    from nlp_analysis import get_nlp_model
+    return get_nlp_model()
 
 
-nlp_mod = load_modules()
+# Import the functions we need from the other module
+from nlp_analysis import rule_based_sentiment, extract_review_text
+nlp = load_nlp_model()
 
 
 def analyze_text(text: str):
     if not text or text.strip() == "":
         return None
 
-    # Sentiment using rule-based function from the repo
-    sentiment = nlp_mod.rule_based_sentiment(text)
+    sentiment = rule_based_sentiment(text)
 
     # Run spaCy NER (limit length for performance)
-    doc = nlp_mod.nlp(text[:2000])
+    doc = nlp(text[:2000])
     entities = [(ent.text, ent.label_) for ent in doc.ents if ent.label_ in ["PRODUCT", "ORG", "PERSON", "GPE"]]
 
     return {"sentiment": sentiment, "entities": entities}
@@ -78,7 +77,7 @@ if uploaded is not None:
                 break
             # Try to extract review text using helper if available
             try:
-                review = nlp_mod.extract_review_text(line)
+                review = extract_review_text(line)
             except Exception:
                 review = line
 
